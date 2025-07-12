@@ -1,0 +1,168 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一小时倒计时</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: #fff;
+        }
+
+        .countdown-container {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .countdown {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .time-box {
+            background: #fff;
+            color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .time-box span {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .time-box p {
+            font-size: 1rem;
+            margin-top: 5px;
+        }
+
+        .reset-button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .reset-button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="countdown-container">
+        <h1>一小时倒计时</h1>
+        <div class="countdown">
+            <div class="time-box">
+                <span id="hours">01</span>
+                <p>小时</p>
+            </div>
+            <div class="time-box">
+                <span id="minutes">00</span>
+                <p>分钟</p>
+            </div>
+            <div class="time-box">
+                <span id="seconds">00</span>
+                <p>秒</p>
+            </div>
+        </div>
+        <button class="reset-button" onclick="resetCountdown()">重置倒计时</button>
+    </div>
+    <script>
+        let startTime = new Date().getTime();
+        let targetTime = startTime + (1 * 60 * 60 * 1000); // 1 hour in milliseconds
+        let interval;
+
+        function updateCountdown() {
+            // Get the current time
+            const now = new Date().getTime();
+            
+            // Calculate the time difference
+            const distance = targetTime - now;
+            
+            // Calculate hours, minutes, seconds
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            
+            // Display the results
+            document.getElementById("hours").textContent = hours.toString().padStart(2, "0");
+            document.getElementById("minutes").textContent = minutes.toString().padStart(2, "0");
+            document.getElementById("seconds").textContent = seconds.toString().padStart(2, "0");
+            
+            // If the countdown is over, display a message
+            if (distance < 0) {
+                clearInterval(interval);
+                document.querySelector(".countdown-container").innerHTML = 
+                    "<h1>倒计时结束！</h1><button class='reset-button' onclick='resetCountdown()'>重置倒计时</button>";
+            }
+        }
+
+        function resetCountdown() {
+            // Clear existing interval
+            clearInterval(interval);
+            
+            // Reset startTime and targetTime
+            startTime = new Date().getTime();
+            targetTime = startTime + (1 * 60 * 60 * 1000); // 1 hour from now
+            
+            // Restore the countdown display
+            const container = document.querySelector(".countdown-container");
+            container.innerHTML = `
+                <h1>一小时倒计时</h1>
+                <div class="countdown">
+                    <div class="time-box">
+                        <span id="hours">01</span>
+                        <p>小时</p>
+                    </div>
+                    <div class="time-box">
+                        <span id="minutes">00</span>
+                        <p>分钟</p>
+                    </div>
+                    <div class="time-box">
+                        <span id="seconds">00</span>
+                        <p>秒</p>
+                    </div>
+                </div>
+                <button class="reset-button" onclick="resetCountdown()">重置倒计时</button>
+            `;
+            
+            // Restart the countdown
+            interval = setInterval(updateCountdown, 1000);
+            updateCountdown();
+        }
+
+        // Start the countdown
+        interval = setInterval(updateCountdown, 1000);
+        updateCountdown();
+    </script>
+</body>
+</html>

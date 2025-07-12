@@ -1,748 +1,571 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-	
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>传统时辰钟 - 子午流注</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+  <style>
+    @keyframes pulse-bg {
+      0%, 100% { background-color: #3b82f6; opacity: 1; }
+      50% { background-color: #60a5fa; opacity: 0.4; }
+    }
 
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-2RJLHVT1Z4"></script>
+    .pulse-hour {
+      animation: pulse-bg 1.5s infinite;
+    }
+
+    .hour-label {
+      position: absolute;
+      width: 70px;
+      height: 70px;
+      text-align: center;
+      transform: translate(-50%, -50%);
+      font-size: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .hour-label span {
+      font-size: 13px;
+      color: #555;
+    }
+
+    .active-hour {
+      background-color: #3b82f6;
+      color: white;
+      border-radius: 9999px;
+      width: 70px;
+      height: 70px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.15);
+    }
+
+    .active-hour.pulse-hour {
+      animation: pulse-bg 1.5s infinite;
+    }
+
+    .nav-link {
+      transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+      background-color: #3b82f6;
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .nav-link.active {
+      background-color: #3b82f6;
+      color: white;
+    }
+
+    .content-section {
+      display: none;
+    }
+
+    .content-section.active {
+      display: block;
+    }
+
+    .zodiac-card {
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .zodiac-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    .meridian-info {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 15px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+  </style>
+  
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-WL2DCW76BM"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', 'G-2RJLHVT1Z4');
+  gtag('config', 'G-WL2DCW76BM');
 </script>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elegant Timer</title>
-	<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-SRCSZV2H1B"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-SRCSZV2H1B');
-</script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-
-        .background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            z-index: -2;
-        }
-
-        .floating-shapes {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        .shape {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            animation: float 20s infinite linear;
-        }
-
-        .shape:nth-child(1) {
-            width: 80px;
-            height: 80px;
-            left: 10%;
-            animation-delay: 0s;
-        }
-
-        .shape:nth-child(2) {
-            width: 60px;
-            height: 60px;
-            left: 20%;
-            animation-delay: 5s;
-        }
-
-        .shape:nth-child(3) {
-            width: 100px;
-            height: 100px;
-            left: 70%;
-            animation-delay: 10s;
-        }
-
-        .shape:nth-child(4) {
-            width: 40px;
-            height: 40px;
-            left: 80%;
-            animation-delay: 15s;
-        }
-
-        @keyframes float {
-            0% {
-                transform: translateY(100vh) rotate(0deg);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100px) rotate(360deg);
-                opacity: 0;
-            }
-        }
-
-        .container {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(20px);
-            border-radius: 30px;
-            padding: 40px;
-            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            text-align: center;
-            min-width: 400px;
-            transform: translateY(0);
-            transition: all 0.3s ease;
-        }
-
-        .container:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 35px 55px rgba(0, 0, 0, 0.3);
-        }
-
-        h1 {
-            color: white;
-            font-size: 2.5em;
-            margin-bottom: 30px;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            font-weight: 300;
-        }
-
-        .mode-selector {
-            display: none;
-        }
-
-        .mode-btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 25px;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 16px;
-            font-weight: 500;
-        }
-
-        .mode-btn.active {
-            background: rgba(255, 255, 255, 0.4);
-            transform: scale(1.05);
-        }
-
-        .mode-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .timer-setup {
-            margin-bottom: 30px;
-        }
-
-        .time-input {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .input-group label {
-            color: white;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .time-select {
-            padding: 12px 15px;
-            border: none;
-            border-radius: 15px;
-            background: rgba(255, 255, 255, 0.9);
-            font-size: 18px;
-            font-weight: bold;
-            text-align: center;
-            min-width: 80px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .time-select:focus {
-            outline: none;
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-        }
-
-        .display {
-            font-size: 4em;
-            font-weight: bold;
-            color: white;
-            margin: 30px 0;
-            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-            font-family: 'Courier New', monospace;
-            text-align: center;
-        }
-
-        .progress-ring {
-            position: relative;
-            width: 200px;
-            height: 200px;
-            margin: 20px auto;
-        }
-
-        .progress-ring-bg {
-            fill: none;
-            stroke: rgba(255, 255, 255, 0.2);
-            stroke-width: 8;
-        }
-
-        .progress-ring-progress {
-            fill: none;
-            stroke: #fff;
-            stroke-width: 8;
-            stroke-linecap: round;
-            transform: rotate(-90deg);
-            transform-origin: 50% 50%;
-            transition: stroke-dasharray 0.5s ease;
-            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
-        }
-
-        .controls {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .btn {
-            padding: 15px 30px;
-            border: none;
-            border-radius: 25px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(45deg, #ff6b6b, #ffa500);
-            color: white;
-            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(255, 107, 107, 0.6);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-3px);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.95);
-            color: #333;
-            padding: 20px 25px;
-            border-radius: 15px;
-            font-weight: bold;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            transform: translateX(400px);
-            transition: all 0.5s ease;
-        }
-
-        .notification.show {
-            transform: translateX(0);
-        }
-
-        .pulsing {
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        /* Tablet styles */
-        @media (max-width: 768px) {
-            .container {
-                min-width: 350px;
-                padding: 30px;
-                margin: 15px;
-            }
-            
-            h1 {
-                font-size: 2em;
-                margin-bottom: 25px;
-            }
-            
-            .display {
-                font-size: 3.2em;
-                margin: 25px 0;
-            }
-            
-            .progress-ring {
-                width: 180px;
-                height: 180px;
-            }
-            
-            .btn {
-                padding: 12px 25px;
-                font-size: 16px;
-                margin: 0 5px;
-            }
-            
-            .controls {
-                gap: 15px;
-                flex-wrap: wrap;
-            }
-        }
-
-        /* Mobile styles */
-        @media (max-width: 480px) {
-            body {
-                padding: 10px;
-            }
-            
-            .container {
-                min-width: unset;
-                width: 95%;
-                max-width: 350px;
-                padding: 20px 15px;
-                margin: 10px auto;
-                border-radius: 20px;
-            }
-            
-            h1 {
-                font-size: 1.8em;
-                margin-bottom: 20px;
-            }
-            
-            .timer-setup {
-                margin-bottom: 20px;
-            }
-            
-            .time-input {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .time-select {
-                padding: 10px 12px;
-                font-size: 16px;
-                min-width: 120px;
-                width: 100%;
-                max-width: 200px;
-            }
-            
-            .display {
-                font-size: 2.5em;
-                margin: 20px 0;
-            }
-            
-            .progress-ring {
-                width: 140px;
-                height: 140px;
-                margin: 15px auto;
-            }
-            
-            .progress-ring svg {
-                width: 140px;
-                height: 140px;
-            }
-            
-            .progress-ring-bg,
-            .progress-ring-progress {
-                r: 60;
-                cx: 70;
-                cy: 70;
-                stroke-width: 6;
-            }
-            
-            .controls {
-                gap: 10px;
-                margin-top: 20px;
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .btn {
-                padding: 12px 20px;
-                font-size: 14px;
-                min-width: 120px;
-                width: 100%;
-                max-width: 150px;
-            }
-            
-            .notification {
-                top: 10px;
-                right: 10px;
-                left: 10px;
-                transform: translateY(-100px);
-                font-size: 14px;
-                padding: 15px 20px;
-                text-align: center;
-            }
-            
-            .notification.show {
-                transform: translateY(0);
-            }
-        }
-
-        /* Very small mobile devices */
-        @media (max-width: 320px) {
-            .container {
-                padding: 15px 10px;
-                width: 98%;
-            }
-            
-            h1 {
-                font-size: 1.6em;
-            }
-            
-            .display {
-                font-size: 2em;
-            }
-            
-            .progress-ring {
-                width: 120px;
-                height: 120px;
-            }
-            
-            .progress-ring svg {
-                width: 120px;
-                height: 120px;
-            }
-            
-            .progress-ring-bg,
-            .progress-ring-progress {
-                r: 50;
-                cx: 60;
-                cy: 60;
-                stroke-width: 5;
-            }
-            
-            .btn {
-                font-size: 13px;
-                padding: 10px 15px;
-            }
-        }
-
-        /* Landscape mobile orientation */
-        @media (max-height: 600px) and (orientation: landscape) {
-            .container {
-                padding: 15px 25px;
-                transform: scale(0.9);
-            }
-            
-            .progress-ring {
-                width: 120px;
-                height: 120px;
-                margin: 10px auto;
-            }
-            
-            .progress-ring svg {
-                width: 120px;
-                height: 120px;
-            }
-            
-            .progress-ring-bg,
-            .progress-ring-progress {
-                r: 50;
-                cx: 60;
-                cy: 60;
-            }
-            
-            .display {
-                font-size: 2.5em;
-                margin: 15px 0;
-            }
-            
-            .controls {
-                margin-top: 15px;
-                flex-direction: row;
-                gap: 10px;
-            }
-            
-            .btn {
-                padding: 8px 15px;
-                font-size: 14px;
-                min-width: 80px;
-            }
-        }
-
-        /* Touch-friendly improvements */
-        @media (hover: none) and (pointer: coarse) {
-            .btn {
-                min-height: 44px;
-                min-width: 44px;
-            }
-            
-            .time-select {
-                min-height: 44px;
-                font-size: 16px; /* Prevents zoom on iOS */
-            }
-            
-            .btn:active {
-                transform: scale(0.95);
-            }
-        }
-    </style>
 </head>
-<body>
-    <div class="background"></div>
-    <div class="floating-shapes">
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
-    </div>
-
-    <div class="container">
-        <h1>Elegant Timer</h1>
-        
-        <div class="timer-setup">
-            <div class="time-input">
-                <div class="input-group">
-                    <label>Select Duration</label>
-                    <select class="time-select" id="timeSelect">
-                        <option value="60">1 minute</option>
-                        <option value="120">2 minutes</option>
-                        <option value="180">3 minutes</option>
-                        <option value="240">4 minutes</option>
-                        <option value="300" selected>5 minutes</option>
-                        <option value="360">6 minutes</option>
-                        <option value="420">7 minutes</option>
-                        <option value="480">8 minutes</option>
-                        <option value="540">9 minutes</option>
-                        <option value="600">10 minutes</option>
-                        <option value="900">15 minutes</option>
-                        <option value="1200">20 minutes</option>
-                        <option value="1800">30 minutes</option>
-                        <option value="2700">45 minutes</option>
-                        <option value="3000">50 minutes</option>
-                        <option value="3600">1 hour</option>
-                        <option value="7200">2 hours</option>
-                        <option value="10800">3 hours</option>
-                        <option value="14400">4 hours</option>
-                        <option value="18000">5 hours</option>
-                        <option value="21600">6 hours</option>
-                        <option value="25200">7 hours</option>
-                        <option value="28800">8 hours</option>
-                        <option value="32400">9 hours</option>
-                        <option value="36000">10 hours</option>
-                        <option value="39600">11 hours</option>
-                        <option value="43200">12 hours</option>
-                    </select>
-                </div>
-            </div>
+<body class="bg-gradient-to-b from-white to-gray-100 min-h-screen">
+  <!-- 导航菜单 -->
+  <nav class="navbar">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex justify-between items-center py-4">
+        <div class="flex items-center">
+          <h1 class="text-xl font-bold text-gray-800">Traditional Time Clock</h1>
         </div>
-
-        <div class="progress-ring">
-            <svg width="200" height="200">
-                <circle class="progress-ring-bg" cx="100" cy="100" r="90"></circle>
-                <circle class="progress-ring-progress" cx="100" cy="100" r="90" 
-                        stroke-dasharray="565.48" stroke-dashoffset="565.48"></circle>
+        <div class="hidden md:flex space-x-1">
+          <button class="nav-link active" onclick="showSection('home')">Home</button>
+          <button class="nav-link" onclick="showSection('zodiac')">Zodiac Hours</button>
+          <button class="nav-link" onclick="showSection('meridian')">Meridian Flow</button>
+          <button class="nav-link" onclick="showSection('countdown')">Countdown</button>
+          <button class="nav-link" onclick="showSection('health')">Wellness Guide</button>
+          <button class="nav-link" onclick="showSection('about')">About</button>
+        </div>
+        <div class="md:hidden">
+          <button class="text-gray-600" onclick="toggleMobileMenu()">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
             </svg>
+          </button>
+        </div>
+      </div>
+      <!-- 移动端菜单 -->
+      <div id="mobile-menu" class="hidden md:hidden pb-4">
+        <div class="flex flex-col space-y-2">
+          <button class="nav-link active" onclick="showSection('home')">Home</button>
+          <button class="nav-link" onclick="showSection('zodiac')">Zodiac Hours</button>
+          <button class="nav-link" onclick="showSection('meridian')">Meridian Flow</button>
+          <button class="nav-link" onclick="showSection('countdown')">Countdown</button>
+          <button class="nav-link" onclick="showSection('health')">Wellness Guide</button>
+          <button class="nav-link" onclick="showSection('about')">About</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 主要内容区域 -->
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    
+    <!-- 首页内容 -->
+    <div id="home" class="content-section active">
+      <div class="text-center">
+        <h1 class="text-5xl font-bold text-gray-800 mb-6 tracking-wide">
+          Traditional Time Clock
+        </h1>
+        <p class="text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
+          Discover the ancient wisdom of Chinese time culture. Explore the twelve zodiac hours and meridian flow theory to master optimal wellness timing.
+        </p>
+
+        <div class="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto items-center">
+          <!-- 传统时辰钟 -->
+          <div class="clock-container w-[400px] h-[400px] mx-auto rounded-full border-8 border-gray-200">
+            <!-- 表盘内容 -->
+            <div id="clock-face"></div>
+
+            <!-- 中心文本 -->
+            <div class="absolute inset-0 flex flex-col justify-center items-center text-indigo-600 font-semibold">
+              <div class="text-lg mb-2">Current Period</div>
+              <div class="text-3xl" id="current-period">--</div>
+            </div>
+          </div>
+
+          <!-- 倒计时组件 -->
+          <div class="quick-countdown-card">
+            <div class="countdown-header">
+              <h3>Quick Timer</h3>
+              <p>Simple countdown for your tasks</p>
+            </div>
+            
+            <!-- 倒计时显示 -->
+            <div id="home-countdown" class="countdown-display">
+              <div class="time-display">
+                <div class="time-unit">
+                  <span id="home-hours">00</span>
+                  <label>H</label>
+                </div>
+                <div class="time-separator">:</div>
+                <div class="time-unit">
+                  <span id="home-minutes">00</span>
+                  <label>M</label>
+                </div>
+                <div class="time-separator">:</div>
+                <div class="time-unit">
+                  <span id="home-seconds">00</span>
+                  <label>S</label>
+                </div>
+              </div>
+              
+              <div class="countdown-status">
+                <div id="home-countdown-title">Ready to start</div>
+                <div id="home-countdown-subtitle">Set your time below</div>
+              </div>
+            </div>
+
+            <!-- 时间输入 -->
+            <div class="time-input-section">
+              <div class="time-inputs">
+                <div class="input-group">
+                  <input type="number" id="home-hours-input" placeholder="0" min="0" max="99" value="0">
+                  <label>Hours</label>
+                </div>
+                <div class="input-group">
+                  <input type="number" id="home-minutes-input" placeholder="0" min="0" max="59" value="5">
+                  <label>Minutes</label>
+                </div>
+                <div class="input-group">
+                  <input type="number" id="home-seconds-input" placeholder="0" min="0" max="59" value="0">
+                  <label>Seconds</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- 控制按钮 -->
+            <div class="control-buttons">
+              <button id="home-start-btn" class="control-btn primary" onclick="startHomeCountdown()">
+                <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Start
+              </button>
+              <button id="home-pause-btn" class="control-btn secondary" onclick="pauseHomeCountdown()" style="display: none;">
+                <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Pause
+              </button>
+              <button id="home-resume-btn" class="control-btn primary" onclick="resumeHomeCountdown()" style="display: none;">
+                <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Resume
+              </button>
+              <button id="home-reset-btn" class="control-btn reset" onclick="resetHomeCountdown()">
+                <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                Reset
+              </button>
+            </div>
+
+            <!-- 快速预设 -->
+            <div class="preset-buttons">
+              <button class="preset-btn" onclick="setPresetTime(0, 5, 0)">5m</button>
+              <button class="preset-btn" onclick="setPresetTime(0, 10, 0)">10m</button>
+              <button class="preset-btn" onclick="setPresetTime(0, 15, 0)">15m</button>
+              <button class="preset-btn" onclick="setPresetTime(0, 30, 0)">30m</button>
+              <button class="preset-btn" onclick="setPresetTime(1, 0, 0)">1h</button>
+            </div>
+          </div>
         </div>
 
-        <div class="display" id="timeDisplay">05:00</div>
-
-        <div class="controls">
-            <button class="btn btn-primary" id="startBtn">Start</button>
-            <button class="btn btn-secondary" id="pauseBtn" disabled>Pause</button>
-            <button class="btn btn-secondary" id="resetBtn">Reset</button>
+        <div class="mt-12 grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div class="card">
+            <div class="text-center">
+              <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <h3 class="text-xl font-semibold text-gray-800 mb-3">Zodiac Hours</h3>
+              <p class="text-gray-600">Explore ancient timekeeping methods with each period corresponding to two modern hours</p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="text-center">
+              <div class="w-16 h-16 bg-gradient-to-r from-green-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                </svg>
+              </div>
+              <h3 class="text-xl font-semibold text-gray-800 mb-3">Meridian Flow</h3>
+              <p class="text-gray-600">Traditional Chinese medicine theory for understanding energy flow patterns</p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="text-center">
+              <div class="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                </svg>
+              </div>
+              <h3 class="text-xl font-semibold text-gray-800 mb-3">Wellness Guide</h3>
+              <p class="text-gray-600">Personalized wellness plans based on time period characteristics</p>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
 
-    <div class="notification" id="notification">
-        Time's up!
+    <!-- 十二时辰详情 -->
+    <div id="zodiac" class="content-section">
+      <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Zodiac Hours Explained</h2>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="zodiac-grid"></div>
     </div>
 
-    <script>
-        class Timer {
-            constructor() {
-                this.totalSeconds = 300; // Default 5 minutes
-                this.remainingSeconds = 300;
-                this.isRunning = false;
-                this.interval = null;
-                
-                this.initElements();
-                this.bindEvents();
-                this.updateDisplay();
-                this.updateProgress();
-            }
+    <!-- 倒计时页面 -->
+    <div id="countdown" class="content-section">
+      <div class="text-center mb-12">
+        <h2 class="text-4xl font-bold text-gray-800 mb-4">Countdown Timer</h2>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+          Create beautiful countdown timers for your important events. Set custom dates, times, and themes.
+        </p>
+      </div>
 
-            initElements() {
-                this.display = document.getElementById('timeDisplay');
-                this.startBtn = document.getElementById('startBtn');
-                this.pauseBtn = document.getElementById('pauseBtn');
-                this.resetBtn = document.getElementById('resetBtn');
-                this.timeSelect = document.getElementById('timeSelect');
-                this.notification = document.getElementById('notification');
-                this.progressRing = document.querySelector('.progress-ring-progress');
-            }
+      <div class="grid lg:grid-cols-2 gap-12 max-w-7xl mx-auto">
+        <!-- 倒计时设置表单 -->
+        <div class="card">
+          <h3 class="text-2xl font-bold text-gray-800 mb-6">Create New Countdown</h3>
+          
+          <form id="countdown-form" class="space-y-6">
+            <div class="form-group">
+              <label class="form-label" for="event-title">Event Title</label>
+              <input type="text" id="event-title" class="form-input" placeholder="e.g., New Year 2024" required>
+            </div>
 
-            bindEvents() {
-                this.startBtn.addEventListener('click', () => this.start());
-                this.pauseBtn.addEventListener('click', () => this.pause());
-                this.resetBtn.addEventListener('click', () => this.reset());
-                
-                this.timeSelect.addEventListener('change', () => this.updateTime());
-            }
+            <div class="form-group">
+              <label class="form-label" for="event-date">Event Date & Time</label>
+              <input type="datetime-local" id="event-date" class="form-input" required>
+            </div>
 
-            updateTime() {
-                if (this.isRunning) return;
-                
-                this.totalSeconds = parseInt(this.timeSelect.value);
-                this.remainingSeconds = this.totalSeconds;
-                this.updateDisplay();
-                this.updateProgress();
-            }
+            <div class="form-group">
+              <label class="form-label" for="countdown-theme">Theme</label>
+              <select id="countdown-theme" class="form-select">
+                <option value="default">Default</option>
+                <option value="dark">Dark</option>
+                <option value="minimal">Minimal</option>
+                <option value="colorful">Colorful</option>
+                <option value="elegant">Elegant</option>
+              </select>
+            </div>
 
-            start() {
-                if (!this.isRunning) {
-                    this.isRunning = true;
-                    this.startBtn.disabled = true;
-                    this.pauseBtn.disabled = false;
-                    this.timeSelect.disabled = true;
-                    
-                    this.interval = setInterval(() => {
-                        this.remainingSeconds--;
-                        this.updateDisplay();
-                        this.updateProgress();
-                        
-                        if (this.remainingSeconds <= 0) {
-                            this.complete();
-                        }
-                    }, 1000);
-                }
-            }
+            <div class="form-group">
+              <label class="form-label" for="countdown-message">Custom Message</label>
+              <textarea id="countdown-message" class="form-input" rows="3" placeholder="Optional message to display when countdown ends"></textarea>
+            </div>
 
-            pause() {
-                if (this.isRunning) {
-                    this.isRunning = false;
-                    this.startBtn.disabled = false;
-                    this.pauseBtn.disabled = true;
-                    clearInterval(this.interval);
-                }
-            }
+            <div class="flex gap-4">
+              <button type="submit" class="btn btn-primary flex-1">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Start Countdown
+              </button>
+              <button type="button" class="btn btn-secondary" onclick="resetCountdown()">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                Reset
+              </button>
+            </div>
+          </form>
 
-            reset() {
-                this.isRunning = false;
-                this.startBtn.disabled = false;
-                this.pauseBtn.disabled = true;
-                this.timeSelect.disabled = false;
-                clearInterval(this.interval);
-                
-                this.remainingSeconds = this.totalSeconds;
-                this.updateDisplay();
-                this.updateProgress();
-                
-                document.querySelector('.container').classList.remove('pulsing');
-            }
+          <!-- 保存的倒计时列表 -->
+          <div class="mt-8">
+            <h4 class="text-lg font-semibold text-gray-800 mb-4">Saved Countdowns</h4>
+            <div id="saved-countdowns" class="space-y-3">
+              <!-- 保存的倒计时将在这里显示 -->
+            </div>
+          </div>
+        </div>
 
-            complete() {
-                this.reset();
-                this.showNotification();
-                document.querySelector('.container').classList.add('pulsing');
-                
-                // Play sound notification (if browser supports it)
-                try {
-                    const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmYLGpPVyLqnrZWBjYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmYLGpPVyLqnrZWBjYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmYLGpPVyLqnrZWBjYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmYLGpPVyLqnrZWBjYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmYLGpPVyLqnrZWBjYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmYLGpPVyLqnrZWBjYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmYLGpPVyLqnrZWBjYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmYLGpPVyLqnrZWBjYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmYLGpPVyLqnrZWBjYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmYI=');
-                    audio.play();
-                } catch (e) {
-                    console.log('Audio playback not supported');
-                }
-            }
+        <!-- 倒计时显示区域 -->
+        <div class="card">
+          <div id="countdown-display" class="text-center">
+            <div class="mb-6">
+              <h3 id="countdown-title" class="text-2xl font-bold text-gray-800 mb-2">No Countdown Set</h3>
+              <p id="countdown-subtitle" class="text-gray-600">Create a new countdown to get started</p>
+            </div>
 
-            updateDisplay() {
-                const hours = Math.floor(this.remainingSeconds / 3600);
-                const minutes = Math.floor((this.remainingSeconds % 3600) / 60);
-                const seconds = this.remainingSeconds % 60;
-                
-                if (hours > 0) {
-                    this.display.textContent = 
-                        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                } else {
-                    this.display.textContent = 
-                        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                }
-            }
+            <div id="countdown-timer" class="countdown-container" style="display: none;">
+              <div class="countdown">
+                <div class="time-box">
+                  <span id="days">00</span>
+                  <p>Days</p>
+                </div>
+                <div class="time-box">
+                  <span id="hours">00</span>
+                  <p>Hours</p>
+                </div>
+                <div class="time-box">
+                  <span id="minutes">00</span>
+                  <p>Minutes</p>
+                </div>
+                <div class="time-box">
+                  <span id="seconds">00</span>
+                  <p>Seconds</p>
+                </div>
+              </div>
+            </div>
 
-            updateProgress() {
-                const circumference = 2 * Math.PI * 90;
-                const progress = (this.totalSeconds - this.remainingSeconds) / this.totalSeconds;
-                const offset = circumference - (progress * circumference);
-                this.progressRing.style.strokeDashoffset = offset;
-            }
+            <div id="countdown-complete" class="text-center" style="display: none;">
+              <div class="w-24 h-24 bg-gradient-to-r from-green-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              <h3 class="text-2xl font-bold text-gray-800 mb-2">Countdown Complete!</h3>
+              <p id="completion-message" class="text-gray-600">Your event has arrived!</p>
+            </div>
 
-            showNotification() {
-                this.notification.classList.add('show');
-                setTimeout(() => {
-                    this.notification.classList.remove('show');
-                }, 3000);
-            }
-        }
+            <!-- 主题预览 -->
+            <div class="mt-8">
+              <h4 class="text-lg font-semibold text-gray-800 mb-4">Theme Preview</h4>
+              <div class="grid grid-cols-5 gap-3">
+                <button class="theme-preview active" data-theme="default" onclick="previewTheme('default')">
+                  <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg"></div>
+                  <span class="text-xs mt-1">Default</span>
+                </button>
+                <button class="theme-preview" data-theme="dark" onclick="previewTheme('dark')">
+                  <div class="w-12 h-12 bg-gray-800 rounded-lg"></div>
+                  <span class="text-xs mt-1">Dark</span>
+                </button>
+                <button class="theme-preview" data-theme="minimal" onclick="previewTheme('minimal')">
+                  <div class="w-12 h-12 bg-white border-2 border-gray-300 rounded-lg"></div>
+                  <span class="text-xs mt-1">Minimal</span>
+                </button>
+                <button class="theme-preview" data-theme="colorful" onclick="previewTheme('colorful')">
+                  <div class="w-12 h-12 bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 rounded-lg"></div>
+                  <span class="text-xs mt-1">Colorful</span>
+                </button>
+                <button class="theme-preview" data-theme="elegant" onclick="previewTheme('elegant')">
+                  <div class="w-12 h-12 bg-gradient-to-r from-gray-700 to-gray-900 rounded-lg"></div>
+                  <span class="text-xs mt-1">Elegant</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        // Initialize timer
-        const timer = new Timer();
-    </script>
+    <!-- 子午流注详情 -->
+    <div id="meridian" class="content-section">
+      <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Meridian Flow Theory</h2>
+      
+      <div class="meridian-info">
+        <h3 class="text-2xl font-bold mb-4">什么是子午流注？</h3>
+        <p class="text-lg leading-relaxed">
+          子午流注是中医经络学说的重要组成部分，认为人体气血在十二经脉中按照特定的时间规律运行。
+          每个时辰都有对应的经脉当令，此时该经脉的气血最为旺盛，是治疗相关疾病的最佳时机。
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8 mt-8">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">子午流注原理</h3>
+          <ul class="space-y-2 text-gray-600">
+            <li>• 气血在十二经脉中循环运行</li>
+            <li>• 每个时辰对应一条经脉</li>
+            <li>• 当令经脉气血最旺盛</li>
+            <li>• 遵循"子午流注"时间规律</li>
+          </ul>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">临床应用</h3>
+          <ul class="space-y-2 text-gray-600">
+            <li>• 针灸治疗时间选择</li>
+            <li>• 中药服用最佳时机</li>
+            <li>• 养生保健时间安排</li>
+            <li>• 疾病预防与调理</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-8">
+        <h3 class="text-2xl font-bold text-gray-800 mb-6">十二经脉时辰对应表</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full bg-white rounded-lg shadow-md">
+            <thead class="bg-indigo-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">时辰</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">时间</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">经脉</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">功能特点</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200" id="meridian-table">
+              <!-- 表格内容将通过JavaScript动态生成 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 养生指南 -->
+    <div id="health" class="content-section">
+      <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Wellness Guide</h2>
+      
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">日常养生原则</h3>
+          <ul class="space-y-3 text-gray-600">
+            <li><strong>顺应自然：</strong>根据时辰特点安排作息</li>
+            <li><strong>饮食有节：</strong>按时进餐，避免暴饮暴食</li>
+            <li><strong>运动适度：</strong>选择合适时间进行运动</li>
+            <li><strong>情志调节：</strong>保持心情愉悦，避免过度情绪</li>
+          </ul>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">时辰养生要点</h3>
+          <ul class="space-y-3 text-gray-600">
+            <li><strong>子时（23-1点）：</strong>宜安睡，养肝血</li>
+            <li><strong>午时（11-13点）：</strong>宜小憩，养心气</li>
+            <li><strong>卯时（5-7点）：</strong>宜起床，养肺气</li>
+            <li><strong>酉时（17-19点）：</strong>宜收心，养肾气</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-8 bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-lg">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">四季养生建议</h3>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <h4 class="font-semibold text-gray-700 mb-2">春季养生</h4>
+            <p class="text-gray-600">顺应春生之气，早睡早起，多食绿色蔬菜，适当运动</p>
+          </div>
+          <div>
+            <h4 class="font-semibold text-gray-700 mb-2">夏季养生</h4>
+            <p class="text-gray-600">顺应夏长之气，晚睡早起，清淡饮食，避免过度劳累</p>
+          </div>
+          <div>
+            <h4 class="font-semibold text-gray-700 mb-2">秋季养生</h4>
+            <p class="text-gray-600">顺应秋收之气，早睡早起，润燥养肺，适当进补</p>
+          </div>
+          <div>
+            <h4 class="font-semibold text-gray-700 mb-2">冬季养生</h4>
+            <p class="text-gray-600">顺应冬藏之气，早睡晚起，温补养肾，注意保暖</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 关于页面 -->
+    <div id="about" class="content-section">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">About Traditional Time Clock</h2>
+        
+        <div class="bg-white p-8 rounded-lg shadow-md">
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">项目介绍</h3>
+          <p class="text-gray-600 leading-relaxed mb-6">
+            传统时辰钟是一个融合中华传统文化与现代技术的网站，旨在传承和弘扬中华传统时间文化。
+            通过直观的时钟显示和详细的子午流注理论，帮助用户了解古代计时方式，掌握养生保健的最佳时机。
+          </p>
+          
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">技术特点</h3>
+          <ul class="list-disc list-inside text-gray-600 space-y-2 mb-6">
+            <li>实时显示当前时辰</li>
+            <li>详细的十二时辰介绍</li>
+            <li>完整的子午流注理论</li>
+            <li>实用的养生指南</li>
+            <li>响应式设计，支持多设备</li>
+          </ul>
+          
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">文化价值</h3>
+          <p class="text-gray-600 leading-relaxed">
+            中华传统文化博大精深，时辰文化是其中重要的组成部分。通过现代技术手段展示传统智慧，
+            让更多人了解中华文化的独特魅力，传承中华民族的优秀传统文化。
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
 </body>
 </html>
