@@ -1,3 +1,44 @@
+// SEO and Performance optimizations
+document.addEventListener('DOMContentLoaded', function() {
+    // Lazy loading for images
+    const images = document.querySelectorAll('img[loading="lazy"]');
+    const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                img.src = img.dataset.src;
+                img.classList.add('loaded');
+                observer.unobserve(img);
+            }
+        });
+    });
+    
+    images.forEach(img => imageObserver.observe(img));
+    
+    // Update page title for better SEO
+    updatePageTitle();
+});
+
+function updatePageTitle() {
+    const currentSection = document.querySelector('.content-section.active');
+    if (currentSection) {
+        const sectionId = currentSection.id;
+        const titles = {
+            'home': 'Traditional Time Clock - Employee Time Clock | Mechanical Time Clock',
+            'zodiac': 'Zodiac Hours - Traditional Time Clock | Employee Time Clock',
+            'meridian': 'Meridian Flow - Traditional Time Clock | Time Card Machine',
+            'countdown': 'Countdown Timer - Traditional Time Clock | Punch Card Time Clock',
+            'health': 'Wellness Guide - Traditional Time Clock | Time and Attendance Clock',
+            'faq': 'FAQ - Traditional Time Clock | Time Clock for Small Business',
+            'about': 'About - Traditional Time Clock | Heavy Duty Time Clock'
+        };
+        
+        if (titles[sectionId]) {
+            document.title = titles[sectionId];
+        }
+    }
+}
+
 // 十二时辰数据
 const zodiac = [
   { 
@@ -303,16 +344,17 @@ function showSection(sectionId) {
     link.classList.remove('active');
   });
   
-      // 找到对应的导航按钮并激活
-    const navButtons = document.querySelectorAll('.nav-link');
-    const sectionMap = {
-      'home': 0,
-      'zodiac': 1,
-      'meridian': 2,
-      'countdown': 3,
-      'health': 4,
-      'about': 5
-    };
+  // 找到对应的导航按钮并激活
+  const navButtons = document.querySelectorAll('.nav-link');
+  const sectionMap = {
+    'home': 0,
+    'zodiac': 1,
+    'meridian': 2,
+    'countdown': 3,
+    'health': 4,
+    'faq': 5,
+    'about': 6
+  };
   
   if (sectionMap[sectionId] !== undefined && navButtons[sectionMap[sectionId]]) {
     navButtons[sectionMap[sectionId]].classList.add('active');
@@ -326,6 +368,37 @@ function showSection(sectionId) {
   
   // 滚动到顶部
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  
+  // SEO optimization - update page title and meta description
+  updatePageTitle();
+  updateMetaDescription(sectionId);
+  updateCanonicalUrl(sectionId);
+}
+
+function updateMetaDescription(sectionId) {
+  const descriptions = {
+    'home': 'Discover the best traditional time clock, employee time clock, mechanical time clock, and punch card time clock solutions. Professional time card machine for small business.',
+    'zodiac': 'Explore zodiac hours and traditional timekeeping methods. Learn about employee time clock systems and mechanical time clock solutions.',
+    'meridian': 'Understand meridian flow theory and traditional time clock applications. Professional time card machine and punch card time clock solutions.',
+    'countdown': 'Create beautiful countdown timers with our traditional time clock system. Perfect for employee time tracking and attendance management.',
+    'health': 'Wellness guide based on traditional time clock principles. Learn about time clock for small business and heavy duty time clock applications.',
+    'faq': 'Frequently asked questions about traditional time clock, employee time clock, mechanical time clock, and punch card time clock systems.',
+    'about': 'About Traditional Time Clock - Professional employee time clock, mechanical time clock, and punch card time clock solutions for businesses.'
+  };
+  
+  const metaDescription = document.querySelector('meta[name="description"]');
+  if (metaDescription && descriptions[sectionId]) {
+    metaDescription.setAttribute('content', descriptions[sectionId]);
+  }
+}
+
+function updateCanonicalUrl(sectionId) {
+  const canonical = document.querySelector('link[rel="canonical"]');
+  if (canonical) {
+    const baseUrl = 'https://webintimer.online/';
+    const url = sectionId === 'home' ? baseUrl : `${baseUrl}#${sectionId}`;
+    canonical.setAttribute('href', url);
+  }
 }
 
 // 切换移动端菜单
